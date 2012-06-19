@@ -1,3 +1,3 @@
 [submodule "lib/jquery.create"]
 	path = lib/jquery.create
-	url = git@github.com:gronke/jquery.create.git
+	url = https://github.com/gronke/jquery.create.git
