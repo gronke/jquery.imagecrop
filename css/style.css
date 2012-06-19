@@ -1,0 +1,46 @@
+body {
+}
+
+#area {
+	position: relative;
+	border: 1px solid red;
+}
+
+.imc {
+	position: relative;
+	overflow: hidden;
+	display: block;
+}
+
+.imc-upload {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	z-index: 10;
+	text-align: center;
+}
+
+.imc-upload input {
+	position: relative;
+	z-index: 20;
+}
+
+.imc-upload .imc-drop-zone {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	border: 2px dashed #CCC;
+}
+
+.imc-crop {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	background: blue;
+}

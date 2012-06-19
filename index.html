@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title>jQuery Plugin: Image Crop</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/jquery.create/jquery.create.js"></script>
+	<script type="text/javascript" src="js/jquery.imagecrop.js"></script>
+	<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+<body>
+
+	<h1>Image Crop</h1>
+	<div id="area" style="width: 400px; height: 300px"></div>
+
+	<script type="text/javascript">
+
+		(function($) {
+
+			$(document).ready(function() {
+
+				$("#area").imagecrop();
+
+			});
+
+		})(jQuery);
+
+	</script>
+
+</body>
+</html>
