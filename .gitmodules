@@ -1,3 +1,9 @@
 [submodule "lib/jquery.create"]
 	path = lib/jquery.create
 	url = https://github.com/gronke/jquery.create.git
+[submodule "lib/jquery-mousewheel"]
+	path = lib/jquery-mousewheel
+	url = https://github.com/brandonaaron/jquery-mousewheel.git
+[submodule "lib/Modernizr"]
+	path = lib/Modernizr
+	url = https://github.com/Modernizr/Modernizr.git

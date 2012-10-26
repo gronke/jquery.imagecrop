@@ -1,10 +1,21 @@
-<html>
+<html class="no-js">
 <head>
 	<title>jQuery Plugin: Image Crop</title>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-	<script type="text/javascript" src="http://code.jquery.com/ui/jquery-ui-git.js"></script>
+	
+	<!-- build:js js/modernizr.min.js -->
+	<script type="text/javascript" src="lib/Modernizr/modernizr.js"></script>
+	<script type="text/javascript" src="lib/Modernizr/feature-detects/css-transitions.js"></script>
+	<!-- endbuild -->
+
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="//code.jquery.com/ui/jquery-ui-git.js"></script>
+
+	<!-- build:js js/jquery.imagecrop.min.js -->
 	<script type="text/javascript" src="lib/jquery.create/jquery.create.js"></script>
+	<script type="text/javascript" src="lib/jquery-mousewheel/jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="js/jquery.imagecrop.js"></script>
+	<!-- endbuild -->
+	
 	<link rel="stylesheet" href="css/style.css" type="text/css" />
 </head>
 <body>
@@ -17,9 +28,7 @@
 		(function($) {
 
 			$(document).ready(function() {
-
 				$("#area").imagecrop();
-
 			});
 
 		})(jQuery);
