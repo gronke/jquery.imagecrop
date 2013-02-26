@@ -179,6 +179,13 @@
 
             // Events
             $t.bind("mousewheel", function(e, delta, deltaX, deltaY) {
+
+                e.preventDefault();
+
+                var x = (e.pageX - $img.offset().left) + $(window).scrollLeft();
+                var y = (e.pageY - $img.offset().top) + $(window).scrollTop();
+
+                console.log(x, y, $img.width(), $img.height(), self.getPosition());
                 self.zoom(delta * o.zoomStep);
             });
 
@@ -244,11 +251,11 @@
                 newPos.left = constraint[2];
             }
 
-            $img
-            .css("top", newPos.top)
-            .css("left", newPos.left);
+            //$img
+            //.css("top", newPos.top)
+            //.css("left", newPos.left);
 
-            this.updateDraggableConstraint(newPos);
+            this.updateDraggableConstraint(this.getPosition());
         },
 
         show: function(tab) {
@@ -286,22 +293,35 @@
                 position = $el.position();
 
             do {
-                position.left += $el.position().left;
-                position.top += $el.position().top;
+                position.left += $el.position().left + parseInt($el.css("margin-left"));
+                position.top += $el.position().top + parseInt($el.css("margin-top"));
                 $el = $el.parent();
             } while($el.get(0)!=document);
 
+            position.left -= parseInt($("body").css("margin-left"));
+            position.top -= parseInt($("body").css("margin-top"));
+
             return position;
+        },
+
+        getPosition: function() {
+
+            var $img = this.$img,
+                position = $img.position();
+
+            return {
+                top: position.top,
+                left: position.left,
+                width: $img.width(),
+                height: $img.height()
+            }
+
         },
 
         getConstraint: function(imgPos) {
 
             var $stage = this.$crop,
-                $img = this.$img,
-                imagePosition = $.extend({
-                    width: $img.width(),
-                    height: $img.height()
-                }, (imgPos || {}));
+                $img = this.$img;
 
             return [
                 ($stage.width()-$img.width()),
