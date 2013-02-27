@@ -101,7 +101,7 @@
 			.text(o.text.close)
 			.bind("click", function() {
 				self.show("upload");
-				self.$element.find(".imc-crop").html("");
+				self.$elem.find(".imc-crop").html("");
 			});
 
 			this.show("upload");
@@ -175,8 +175,6 @@
 
 				self.data.originalPosition = position;
 				self.updateDraggableConstraint(position);
-
-				console.log("zoomfactor", self.getZoomFactor(position));
 
 			})
 			.draggable({
@@ -342,8 +340,6 @@
 			// Scroll Position
 			position.left += $body.scrollLeft();
 			position.top += $body.scrollTop();
-
-			console.log($body.scrollTop());
 
 			return position;
 		},
