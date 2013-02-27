@@ -7,7 +7,7 @@
             text: {
                 close: "x"
             },
-            zoomStep: 100,
+            zoomStep: 1,
             onSelect: function() {} // user selects a new image files
         };
 
@@ -24,6 +24,12 @@
             aspect: {
                 img: null,
                 stage: null
+            },
+            originalPosition: { // zoom factor 1.0
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
             },
             activeStage: "upload"
         };
@@ -153,24 +159,24 @@
 
                 // fit image
                 if(aspect_img >= aspect_t) {
-                    $img.height($t.height());
-                    $img.width($img.height() * aspect_img);
-                    position.left = -($img.width()-$t.width())/2;
+                    position.height = $t.height();
+                    position.width = position.height * aspect_img;
+                    position.left = -(position.width-$t.width())/2;
                 } else {
-                    $img.width($t.width());
-                    $img.height($img.width() / aspect_img);
-                    position.top = -($img.height()-$t.height())/2;
+                    position.width = $t.width();
+                    position.height = position.width / aspect_img;
+                    position.top = -(position.height-$t.height())/2;
                 }
 
+                $img.height(position.height);
+                $img.width(position.width);
                 $img.css("left", position.left);
                 $img.css("top", position.top);
 
-                self.updateDraggableConstraint({
-                    width: $img.width(),
-                    height: $img.height(),
-                    top: position.top,
-                    left: position.left
-                });
+                self.data.originalPosition = position;
+                self.updateDraggableConstraint(position);
+
+                console.log("zoomfactor", self.getZoomFactor(position));
 
             })
             .draggable();
@@ -185,7 +191,8 @@
                 var x = (e.pageX - $img.offset().left) + $(window).scrollLeft();
                 var y = (e.pageY - $img.offset().top) + $(window).scrollTop();
 
-                console.log(x, y, $img.width(), $img.height(), self.getPosition());
+                //console.log(x, y, $img.width(), $img.height(), self.getPosition());
+                console.log(delta, o.zoomStep);
                 self.zoom(delta * o.zoomStep);
             });
 
@@ -196,12 +203,9 @@
             this.show("crop");
         },
 
-        zoom: function(px) {
+        zoom: function(deltaZoomFactor, centerPos) { // centerPos relative to stage top left
 
-            if(typeof(px)!="number") {
-                console.log("not a number");
-                return false;
-            }
+            deltaZoomFactor = parseFloat(deltaZoomFactor);
 
             if(this.data.activeStage!="crop")
                 return false;
@@ -209,53 +213,54 @@
             var $crop = this.$crop,
                 $img = $crop.find("img"),
                 aspect = this.data.aspect.img,
-                oldPos = $.extend($img.position(), {
-                    width: parseInt($img.get(0).offsetWidth, 10),
-                    height: parseInt($img.get(0).offsetHeight, 10)
-                }),
-                newPos = {
-                    top: oldPos.top,
-                    left: oldPos.left,
-                    width: oldPos.width + px,
-                    height: (oldPos.width + px) / aspect
-                };
+                oldZoomFactor = this.getZoomFactor(),
+                newZoomFactor = oldZoomFactor + deltaZoomFactor,
+                oldPos = this.getPosition(),
+                newPos = oldPos;
+
+            centerPos = centerPos || {
+                x: $crop.width() / 2,
+                y: $crop.height() / 2
+            };
+
+            if(newZoomFactor < 1)
+                newZoomFactor = 1;
+
+            console.log("factors", oldZoomFactor, deltaZoomFactor, newZoomFactor);
+
+            newPos.width = this.data.originalPosition.width * newZoomFactor;
+            newPos.height = this.data.originalPosition.height * newZoomFactor;
 
             // Dimensions
+
+            /** replaced by matrix
             if(newPos.width<$crop.width()) {
                 newPos.width = $crop.width();
                 newPos.height = newPos.width / aspect;
+                newPos.left = 0;
             } else if(newPos.height<$crop.height()) {
                 newPos.height = $crop.height();
                 newPos.width = newPos.height * aspect;
+                newPos.top = 0;
+            }
+            */
+
+            // Position Constraints
+            if((newPos.left + newPos.width) < $crop.width()) {
+                newPos.left = $crop.width() - newPos.width;
+            }
+
+            if((newPos.top + newPos.height) < $crop.height()) {
+                newPos.top = $crop.height() - newPos.height;
             }
 
             $img
             .width(newPos.width)
-            .height(newPos.height);
+            .height(newPos.height)
+            .css("left", newPos.left)
+            .css("top", newPos.top);
 
-            // Position
-            newPos.top += (oldPos.height-newPos.height) / 2;
-            newPos.left += (oldPos.width-newPos.width) / 2;
-            
-            var constraint = this.getConstraint(newPos);
-
-            if(newPos.top < constraint[1]) {
-                newPos.top = constraint[1];
-            } else if(newPos.top > constraint[3]) {
-                newPos.top = constraint[3];
-            }
-
-            if(newPos.left < constraint[0]) {
-                newPos.left = constraint[0];
-            } else if(newPos.left > constraint[2]) {
-                newPos.left = constraint[2];
-            }
-
-            //$img
-            //.css("top", newPos.top)
-            //.css("left", newPos.left);
-
-            this.updateDraggableConstraint(this.getPosition());
+            this.updateDraggableConstraint(newPos);
         },
 
         show: function(tab) {
@@ -287,6 +292,13 @@
             return $item.width() / $item.height();
         },
 
+        getZoomFactor: function(position) {
+            var position = position || this.getPosition(),
+                originalPosition = this.data.originalPosition;
+
+            return 1 / originalPosition.width * position.width;
+        },
+
         getStagePosition: function() {
             var self = this,
                 $el = this.$crop,
@@ -314,21 +326,23 @@
                 left: position.left,
                 width: $img.width(),
                 height: $img.height()
-            }
+            };
 
         },
 
-        getConstraint: function(imgPos) {
+        getConstraint: function(position) {
 
-            var $stage = this.$crop,
-                $img = this.$img;
+            position = position || this.getPosition();
+
+            var $stage = this.$crop;
 
             return [
-                ($stage.width()-$img.width()),
-                ($stage.height()-$img.height()),
+                ($stage.width()-position.width),
+                ($stage.height()-position.height),
                 0,
                 0
             ];
+
         },
 
         updateDraggableConstraint: function(imgPos) {
